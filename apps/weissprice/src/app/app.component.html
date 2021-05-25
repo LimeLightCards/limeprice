@@ -1,9 +1,49 @@
-<div style="text-align: center">
-  <h1>Welcome to weissprice!</h1>
-  <img
-    width="450"
-    src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png"
-    alt="Nx - Smart, Extensible Build Framework"
-  />
+
+<weissprice-navbar></weissprice-navbar>
+
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-6">
+      <h3>Card CSV</h3>
+      <h6><i>Card Name, Rarity, Amount</i></h6>
+    </div>
+
+    <div class="col-6">
+      <h3>Output</h3>
+      <h6><i>ideal808: {{ ideal808Total | currency:'USD' }} TCGPlayer: {{ tcgplayerTotal | currency:'USD'}}</i></h6>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-6">
+      <textarea rows="10" class="form-control" [(ngModel)]="cards"></textarea>
+
+      <button class="mt-2 btn btn-primary" (click)="checkPrices()" [disabled]="isLoading">
+        {{ isLoading ? 'This is going to take a while...' : 'Check Prices' }}
+      </button>
+    </div>
+
+    <div class="col-6">
+      <div class="scroll" #output>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Card</th>
+              <th>Count</th>
+              <th>ideal808</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let card of cardRefs">
+              <td>{{ card.name }} ({{ card.rarity }})</td>
+              <td>{{ card.count }}</td>
+              <td *ngIf="card.price.ideal808 <= 0">?</td>
+              <td *ngIf="card.price.ideal808 > 0">{{ card.price.ideal808 | currency:'USD' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
-<div>Message: {{ hello$ | async | json }}</div>

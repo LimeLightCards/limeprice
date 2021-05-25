@@ -1,15 +1,23 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
-import { Message } from '@weissprice/api-interfaces';
+import { CardPriceCheck, CardPriceResponse } from '@weissprice/api-interfaces';
 
 import { AppService } from './app.service';
 
-@Controller()
+@Controller('cards')
 export class AppController {
+
   constructor(private readonly appService: AppService) {}
 
-  @Get('hello')
-  getData(): Message {
-    return this.appService.getData();
+  @Post('price')
+  async checkPrice(@Body() cardPriceCheck: CardPriceCheck): Promise<CardPriceResponse> {
+    const cards = await this.appService.getCardsValue(cardPriceCheck.cards);
+    return { cards };
   }
+
+  @Get('ideal808price')
+  async ideal808price(@Query('name') name: string, @Query('rarity') rarity: string): Promise<number> {
+    return this.appService.ideal808(null, { count: 1, rarity, name })
+  }
+
 }
