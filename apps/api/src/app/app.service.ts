@@ -22,7 +22,7 @@ export class AppService {
     const hasBrowser = !!browser;
 
     if(!browser) {
-      browser = await puppeteer.launch();
+      browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     }
 
     const ignoredRarities = ['C', 'CC', 'U'];
@@ -67,7 +67,7 @@ export class AppService {
 
   public async getCardsValue(cards: CardCheck[]): Promise<CardCheckWithPrice[]> {
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
 
     const getCardPrice = async (card: CardCheck) => {
       const ideal808Price = await this.ideal808(browser, card);
