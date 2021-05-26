@@ -19,18 +19,25 @@ export class AppService {
     const storedPrice = await this.db.getIdeal808Price(card.name, card.rarity);
     if(storedPrice) return storedPrice.price;
 
-    const hasBrowser = !!browser;
-
-    if(!browser) {
-      browser = await puppeteer.launch({ args: ['--no-sandbox'] });
-    }
-
     const ignoredRarities = ['C', 'CC', 'U'];
     const search = ignoredRarities.includes(card.rarity) ? card.name : `${card.name} (${card.rarity})`;
 
-    const page = await browser.newPage();
+    const hasBrowser = !!browser;
+
+    if(!browser) {
+      try {
+        browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+      } catch(e) {
+        Logger.error(e, `ideal808 ${search}`);
+
+        if(!hasBrowser) await browser.close();
+        return -1;
+      }
+    }
 
     try {
+      const page = await browser.newPage();
+
       await page.goto(`https://www.ideal808.com/SearchResults/?text=${encodeURIComponent(search)}`);
 
       Logger.log(search, 'ideal808');
