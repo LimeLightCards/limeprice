@@ -8,7 +8,35 @@ import { DBService } from './db.service';
 @Injectable()
 export class AppService {
 
-  constructor(private readonly db: DBService) {}
+  private puppeteer;
+  private scrapeQueue: Array<{ resolve, cb, promise }> = [];
+
+  constructor(private readonly db: DBService) {
+    this.init();
+  }
+
+  private async init() {
+    this.puppeteer = await this.getPuppeteer();
+
+    this.handleQueue();
+
+    process.on('exit', () => this.puppeteer.close());
+  }
+
+  private async handleQueue() {
+    const next = this.scrapeQueue.shift();
+    if(!next) {
+      setTimeout(() => this.handleQueue(), 100);
+      return;
+    }
+
+    const { resolve, cb } = next;
+
+    const val = await cb();
+    resolve(val);
+
+    setTimeout(() => this.handleQueue(), 100);
+  }
 
   private async getPuppeteer() {
     return puppeteer.launch({
@@ -30,7 +58,20 @@ export class AppService {
     return +(price.split('$')[1]);
   }
 
-  public async ideal808(browser, card: CardCheck): Promise<number> {
+  public async checkIdeal808(card: CardCheck): Promise<number> {
+    let resolve = null;
+    const cb = this.ideal808.bind(this, card);
+    const promise = new Promise(resolver => {
+      resolve = resolver;
+    });
+
+    this.scrapeQueue.push({ resolve, promise, cb });
+
+    const val = await promise;
+    return val as number;
+  }
+
+  private async ideal808(card: CardCheck): Promise<number> {
 
     const storedPrice = await this.db.getIdeal808Price(card.name, card.rarity);
     if(storedPrice) return storedPrice.price;
@@ -38,21 +79,8 @@ export class AppService {
     const ignoredRarities = ['C', 'CC', 'U'];
     const search = ignoredRarities.includes(card.rarity) ? card.name : `${card.name} (${card.rarity})`;
 
-    const hasBrowser = !!browser;
-
-    if(!browser) {
-      try {
-        browser = await this.getPuppeteer()
-      } catch(e) {
-        Logger.error(e, `ideal808 ${search}`);
-
-        if(!hasBrowser) await browser.close();
-        return -1;
-      }
-    }
-
     try {
-      const page = await browser.newPage();
+      const page = await this.puppeteer.newPage();
 
       await page.goto(`https://www.ideal808.com/SearchResults/?text=${encodeURIComponent(search)}`);
 
@@ -76,24 +104,18 @@ export class AppService {
 
       await this.db.updateIdeal808Price(card.name, card.rarity, price);
 
-      if(!hasBrowser) await browser.close();
-
       return price;
 
     } catch(e) {
       Logger.error(e, `ideal808 (${search})`);
-
-      if(!hasBrowser) await browser.close();
-      return -1;
+      return 0;
     }
   }
 
   public async getCardsValue(cards: CardCheck[]): Promise<CardCheckWithPrice[]> {
 
-    const browser = await this.getPuppeteer();
-
     const getCardPrice = async (card: CardCheck) => {
-      const ideal808Price = await this.ideal808(browser, card);
+      const ideal808Price = await this.checkIdeal808(card);
 
       return { ideal808: ideal808Price };
     };
@@ -103,10 +125,6 @@ export class AppService {
     for(const card of cards) {
       const price = await getCardPrice(card);
       prices.push(price);
-    }
-
-    if(browser) {
-      await browser.close();
     }
 
     const ret = cards.map((x, i) => ({ ...x, price: prices[i] }));

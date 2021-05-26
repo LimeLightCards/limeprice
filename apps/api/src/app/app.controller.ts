@@ -17,8 +17,7 @@ export class AppController {
 
   @Get('ideal808price')
   async ideal808price(@Query('name') name: string, @Query('rarity') rarity: string): Promise<number> {
-    const price = await this.appService.ideal808(null, { count: 1, rarity, name });
-    if(price === -1) return 0;
+    const price = await this.appService.checkIdeal808({ count: 1, rarity, name });
     return price;
   }
 
