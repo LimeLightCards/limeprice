@@ -2,6 +2,10 @@
   "name": "weissprice",
   "version": "0.0.0",
   "license": "MIT",
+  "engines": {
+    "node": ">= 12"
+  },
+
   "scripts": {
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
