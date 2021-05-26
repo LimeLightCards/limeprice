@@ -100,7 +100,7 @@ export class AppService {
         })
         .filter(x => !x.name.includes('Bushiroad'));
 
-      const price = namesAndPrices[0]?.price ?? -1;
+      const price = namesAndPrices[0]?.price ?? 0;
 
       await this.db.updateIdeal808Price(card.name, card.rarity, price);
 
