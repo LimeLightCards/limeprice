@@ -10,6 +10,22 @@ export class AppService {
 
   constructor(private readonly db: DBService) {}
 
+  private async getPuppeteer() {
+    return puppeteer.launch({
+      ignoreDefaultArgs: ['--disable-extensions'],
+      args: [
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-setuid-sandbox',
+        '--no-first-run',
+        '--no-sandbox',
+        '--no-zygote',
+        '--single-process',
+      ]
+    });
+
+  }
+
   public priceStringToNumber(price: string): number {
     return +(price.split('$')[1]);
   }
@@ -26,7 +42,7 @@ export class AppService {
 
     if(!browser) {
       try {
-        browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+        browser = await this.getPuppeteer()
       } catch(e) {
         Logger.error(e, `ideal808 ${search}`);
 
@@ -74,7 +90,7 @@ export class AppService {
 
   public async getCardsValue(cards: CardCheck[]): Promise<CardCheckWithPrice[]> {
 
-    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+    const browser = await this.getPuppeteer();
 
     const getCardPrice = async (card: CardCheck) => {
       const ideal808Price = await this.ideal808(browser, card);
@@ -89,7 +105,9 @@ export class AppService {
       prices.push(price);
     }
 
-    await browser.close();
+    if(browser) {
+      await browser.close();
+    }
 
     const ret = cards.map((x, i) => ({ ...x, price: prices[i] }));
 
