@@ -81,6 +81,7 @@ export class AppService {
 
     try {
       const page = await this.puppeteer.newPage();
+      await page.setCacheEnabled(false);
 
       await page.goto(`https://www.ideal808.com/SearchResults/?text=${encodeURIComponent(search)}`);
 
