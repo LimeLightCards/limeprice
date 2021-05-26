@@ -73,11 +73,13 @@ export class AppService {
 
   private async ideal808(card: CardCheck): Promise<number> {
 
-    const storedPrice = await this.db.getIdeal808Price(card.name, card.rarity);
-    if(storedPrice) return storedPrice.price;
-
     const ignoredRarities = ['C', 'CC', 'U'];
     const search = ignoredRarities.includes(card.rarity) ? card.name : `${card.name} (${card.rarity})`;
+
+    Logger.log(`Queuing ${search}`, 'ideal808');
+
+    const storedPrice = await this.db.getIdeal808Price(card.name, card.rarity);
+    if(storedPrice) return storedPrice.price;
 
     try {
       const page = await this.puppeteer.newPage();
