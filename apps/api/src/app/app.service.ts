@@ -198,6 +198,7 @@ export class AppService {
       const price = namesAndPrices[0]?.price ?? 0;
 
       await this.db.updateIdeal808Price(card.name, card.rarity, price);
+      await page.close();
 
       return price;
 
