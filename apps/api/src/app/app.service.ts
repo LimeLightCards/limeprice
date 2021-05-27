@@ -1,15 +1,16 @@
 
 import * as puppeteer from 'puppeteer';
+import fetch from 'node-fetch';
 
 import { Injectable, Logger } from '@nestjs/common';
-import { CardCheck, CardCheckWithPrice } from '@weissprice/api-interfaces';
+import { CardCheck, CardCheckWithPrice, Rarity } from '@weissprice/api-interfaces';
 import { DBService } from './db.service';
 
 @Injectable()
 export class AppService {
 
   private puppeteer;
-  private scrapeQueue: Array<{ resolve, cb, promise }> = [];
+  private scrapeQueue: Array<{ resolve, cb, promise, delay? }> = [];
 
   constructor(private readonly db: DBService) {
     this.init();
@@ -30,12 +31,12 @@ export class AppService {
       return;
     }
 
-    const { resolve, cb } = next;
+    const { resolve, cb, delay } = next;
 
     const val = await cb();
     resolve(val);
 
-    setTimeout(() => this.handleQueue(), 100);
+    setTimeout(() => this.handleQueue(), delay || 100);
   }
 
   private async getPuppeteer() {
@@ -56,6 +57,97 @@ export class AppService {
 
   public priceStringToNumber(price: string): number {
     return +(price.split('$')[1]);
+  }
+
+  public async checkTCGPlayer(card: CardCheck): Promise<number> {
+    let resolve = null;
+    const cb = this.tcgPlayer.bind(this, card);
+    const promise = new Promise(resolver => {
+      resolve = resolver;
+    });
+
+    this.scrapeQueue.push({ resolve, promise, cb, delay: 10 });
+
+    const val = await promise;
+    return val as number;
+  }
+
+  private async tcgPlayer(card: CardCheck): Promise<number> {
+
+    Logger.log(`Searching ${card.name} (${card.rarity})`, 'tcgplayer');
+
+    const storedPrice = await this.db.getTCGPlayerPrice(card.name, card.rarity);
+    if(storedPrice) return storedPrice.price;
+
+    const publicKey = process.env.TCGPLAYER_PUBLIC_KEY;
+    const privateKey = process.env.TCGPLAYER_PRIVATE_KEY;
+    const appName = process.env.TCGPLAYER_APPLICATION;
+
+    if(!publicKey || !privateKey || !appName) {
+      Logger.log('Need a public/private key and an app name to TCGPlayer search', 'tcgplayer');
+      return 0;
+    }
+
+    const res = await fetch('https://api.tcgplayer.com/token', {
+      method: 'POST',
+      headers: {
+        'User-Agent': appName,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `grant_type=client_credentials&client_id=${publicKey}&client_secret=${privateKey}`
+    });
+
+    const tokenBody = await res.json();
+    const token = tokenBody.access_token;
+    if(!token) return 0;
+
+    const products = await fetch('https://api.tcgplayer.com/catalog/categories/20/search', {
+      method: 'POST',
+      headers: {
+        'User-Agent': appName,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        sort: "MinPrice DESC",
+        limit: 10,
+        offset: 0,
+        filters: [
+          {
+            name: "ProductName",
+            values: [card.name]
+          },
+          {
+            name: "Rarity",
+            values: [Rarity[card.rarity]]
+          },
+        ]
+      })
+    });
+
+    const productsBody = await products.json();
+    if(productsBody.results.length === 0) return 0;
+
+    const closestId = productsBody.results[0];
+    if(!closestId) return 0;
+
+    const prices = await fetch(`https://api.tcgplayer.com/pricing/product/${closestId}`, {
+      method: 'GET',
+      headers: {
+        'User-Agent': appName,
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const pricesBody = await prices.json();
+    if(pricesBody.results.length === 0) return 0;
+
+    const priceRes = pricesBody.results[0];
+    const price = priceRes.marketPrice || priceRes.midPrice;
+
+    await this.db.updateTCGPlayerPrice(card.name, card.rarity, price);
+
+    return price;
   }
 
   public async checkIdeal808(card: CardCheck): Promise<number> {

@@ -27,7 +27,8 @@ export function setupCollection(collection: Collection): Collection {
 export class DBService {
 
   constructor(
-    @Inject('IDEAL808_PRICES') private ideal808Collection: Collection<Price>
+    @Inject('IDEAL808_PRICES') private ideal808Collection: Collection<Price>,
+    @Inject('TCGPLAYER_PRICES') private tcgplayerCollection: Collection<Price>
   ) {}
 
   public async getIdeal808Price(name: string, rarity: string): Promise<Price> {
@@ -36,6 +37,18 @@ export class DBService {
 
   public async updateIdeal808Price(name: string, rarity: string, price: number): Promise<void> {
     return this.ideal808Collection.updateOne(
+      { name },
+      { $set: { name, rarity, price, createdAt: new Date() } },
+      { upsert: true }
+    );
+  }
+
+  public async getTCGPlayerPrice(name: string, rarity: string): Promise<Price> {
+    return this.tcgplayerCollection.findOne<Price>({ name, rarity });
+  }
+
+  public async updateTCGPlayerPrice(name: string, rarity: string, price: number): Promise<void> {
+    return this.tcgplayerCollection.updateOne(
       { name },
       { $set: { name, rarity, price, createdAt: new Date() } },
       { upsert: true }

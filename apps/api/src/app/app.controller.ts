@@ -21,4 +21,10 @@ export class AppController {
     return price;
   }
 
+  @Get('tcgplayerprice')
+  async tcgplayerprice(@Query('name') name: string, @Query('rarity') rarity: string): Promise<number> {
+    const price = await this.appService.checkTCGPlayer({ count: 1, rarity, name });
+    return price;
+  }
+
 }

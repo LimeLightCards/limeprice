@@ -21,6 +21,11 @@ import { dbInit, DBService, setupCollection } from './db.service';
       useFactory: (client: MongoClient) => setupCollection(client.db('weissprice').collection('ideal808')),
       inject: ['DATABASE_CONNECTION'],
     },
+    {
+      provide: 'TCGPLAYER_PRICES',
+      useFactory: (client: MongoClient) => setupCollection(client.db('weissprice').collection('tcgplayer')),
+      inject: ['DATABASE_CONNECTION'],
+    },
   ]
 })
 export class AppModule {}
