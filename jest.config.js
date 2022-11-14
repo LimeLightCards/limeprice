@@ -1,3 +1,3 @@
 module.exports = {
-  projects: ['<rootDir>/apps/weissprice', '<rootDir>/apps/api'],
+  projects: ['<rootDir>/apps/api'],
 };

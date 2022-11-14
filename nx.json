@@ -26,9 +26,6 @@
     }
   },
   "projects": {
-    "weissprice": {
-      "tags": []
-    },
     "api": {
       "tags": []
     },
