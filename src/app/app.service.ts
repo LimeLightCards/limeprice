@@ -9,7 +9,7 @@ import { DBService } from './db.service';
 @Injectable()
 export class AppService {
 
-  private puppeteer;
+  // private puppeteer;
   private scrapeQueue: Array<{ resolve, cb, promise, delay? }> = [];
 
   constructor(private readonly db: DBService) {
@@ -17,11 +17,11 @@ export class AppService {
   }
 
   private async init() {
-    this.puppeteer = await this.getPuppeteer();
+    // this.puppeteer = await this.getPuppeteer();
 
     this.handleQueue();
 
-    process.on('exit', () => this.puppeteer.close());
+    // process.on('exit', () => this.puppeteer.close());
   }
 
   private async handleQueue() {
@@ -39,6 +39,7 @@ export class AppService {
     setTimeout(() => this.handleQueue(), delay || 100);
   }
 
+  /*
   private async getPuppeteer() {
     return puppeteer.launch({
       ignoreDefaultArgs: ['--disable-extensions'],
@@ -54,6 +55,7 @@ export class AppService {
     });
 
   }
+  */
 
   public priceStringToNumber(price: string): number {
     return +(price.split('$')[1]);
@@ -150,6 +152,7 @@ export class AppService {
     return price;
   }
 
+  /*
   public async checkIdeal808(card: CardCheck): Promise<number> {
     let resolve = null;
     const cb = this.ideal808.bind(this, card);
@@ -162,7 +165,9 @@ export class AppService {
     const val = await promise;
     return val as number;
   }
+  */
 
+  /*
   private async ideal808(card: CardCheck): Promise<number> {
 
     const ignoredRarities = ['C', 'CC', 'U'];
@@ -206,8 +211,11 @@ export class AppService {
       Logger.error(e, `ideal808 (${search})`);
       return 0;
     }
+   return -1;
   }
+  */
 
+  /*
   public async getCardsValue(cards: CardCheck[]): Promise<CardCheckWithPrice[]> {
 
     const getCardPrice = async (card: CardCheck) => {
@@ -227,5 +235,6 @@ export class AppService {
 
     return ret;
   }
+  */
 
 }

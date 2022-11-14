@@ -27,10 +27,11 @@ export function setupCollection(collection: Collection): Collection {
 export class DBService {
 
   constructor(
-    @Inject('IDEAL808_PRICES') private ideal808Collection: Collection<Price>,
+    // @Inject('IDEAL808_PRICES') private ideal808Collection: Collection<Price>,
     @Inject('TCGPLAYER_PRICES') private tcgplayerCollection: Collection<Price>
   ) {}
 
+  /*
   public async getIdeal808Price(name: string, rarity: string): Promise<Price> {
     return this.ideal808Collection.findOne<Price>({ name, rarity });
   }
@@ -42,6 +43,7 @@ export class DBService {
       { upsert: true }
     );
   }
+  */
 
   public async getTCGPlayerPrice(name: string, rarity: string): Promise<Price> {
     return this.tcgplayerCollection.findOne<Price>({ name, rarity });

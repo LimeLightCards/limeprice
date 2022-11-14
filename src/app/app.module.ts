@@ -16,11 +16,13 @@ import { dbInit, DBService, setupCollection } from './db.service';
       provide: 'DATABASE_CONNECTION',
       useFactory: async () => await dbInit()
     },
+    /*
     {
       provide: 'IDEAL808_PRICES',
       useFactory: (client: MongoClient) => setupCollection(client.db('weissprice').collection('ideal808')),
       inject: ['DATABASE_CONNECTION'],
     },
+    */
     {
       provide: 'TCGPLAYER_PRICES',
       useFactory: (client: MongoClient) => setupCollection(client.db('weissprice').collection('tcgplayer')),
