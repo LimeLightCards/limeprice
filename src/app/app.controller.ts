@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
-import { CardPriceCheck, CardPriceResponse } from '@weissprice/api-interfaces';
+import { CardPriceCheck, CardPriceResponse } from '../api-interfaces';
 
 import { AppService } from './app.service';
 

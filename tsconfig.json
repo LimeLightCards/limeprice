@@ -9,14 +9,11 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
-    "module": "esnext",
+    "module": "CommonJS",
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@weissprice/api-interfaces": ["libs/api-interfaces/src/index.ts"]
-    }
+    "baseUrl": "."
   },
   "exclude": ["node_modules", "tmp"]
 }

@@ -3,7 +3,7 @@ import * as puppeteer from 'puppeteer';
 import fetch from 'node-fetch';
 
 import { Injectable, Logger } from '@nestjs/common';
-import { CardCheck, CardCheckWithPrice, Rarity } from '@weissprice/api-interfaces';
+import { CardCheck, CardCheckWithPrice, Rarity } from '../api-interfaces';
 import { DBService } from './db.service';
 
 @Injectable()

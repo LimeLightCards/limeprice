@@ -4,7 +4,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { MongoClient, Collection } from 'mongodb';
 
-import { Price } from '@weissprice/api-interfaces';
+import { Price } from '../api-interfaces';
 
 export async function dbInit() {
 
