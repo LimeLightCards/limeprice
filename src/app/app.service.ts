@@ -1,5 +1,4 @@
 
-import * as puppeteer from 'puppeteer';
 import fetch from 'node-fetch';
 
 import { Injectable, Logger } from '@nestjs/common';
