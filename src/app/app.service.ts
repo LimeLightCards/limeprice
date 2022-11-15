@@ -80,9 +80,9 @@ export class AppService {
     const storedPrice = await this.db.getTCGPlayerPrice(card.code);
     if(storedPrice) return storedPrice.price;
 
-    const publicKey = process.env.TCGPLAYER_PUBLIC_KEY;
-    const privateKey = process.env.TCGPLAYER_PRIVATE_KEY;
-    const appName = process.env.TCGPLAYER_APPLICATION;
+    const publicKey = process.env.TCGPLAYER_PUBLIC_KEY.trim();
+    const privateKey = process.env.TCGPLAYER_PRIVATE_KEY.trim();
+    const appName = process.env.TCGPLAYER_APPLICATION.trim();
 
     if(!publicKey || !privateKey || !appName) {
       Logger.log('Need a public/private key and an app name to TCGPlayer search', 'tcgplayer');
