@@ -75,7 +75,7 @@ export class AppService {
 
   private async tcgPlayer(card: CardCheck): Promise<number> {
 
-    Logger.log(`Searching ${card.name} (${card.rarity})`, 'tcgplayer');
+    Logger.log(`Searching ${card.name} (${card.rarity}) [${card.code}]`, 'tcgplayer');
 
     const storedPrice = await this.db.getTCGPlayerPrice(card.code);
     if(storedPrice) return storedPrice.price;
