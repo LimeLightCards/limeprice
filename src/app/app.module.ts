@@ -19,13 +19,13 @@ import { dbInit, DBService, setupCollection } from './db.service';
     /*
     {
       provide: 'IDEAL808_PRICES',
-      useFactory: (client: MongoClient) => setupCollection(client.db('weissprice').collection('ideal808')),
+      useFactory: (client: MongoClient) => setupCollection(client.db('limeprice').collection('ideal808')),
       inject: ['DATABASE_CONNECTION'],
     },
     */
     {
       provide: 'TCGPLAYER_PRICES',
-      useFactory: (client: MongoClient) => setupCollection(client.db('weissprice').collection('tcgplayer')),
+      useFactory: (client: MongoClient) => setupCollection(client.db('limeprice').collection('tcgplayer')),
       inject: ['DATABASE_CONNECTION'],
     },
   ]
