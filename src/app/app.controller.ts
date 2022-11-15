@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, ParseArrayPipe, Post, Query } from '@nestjs/common';
 
 import { CardPriceCheck, CardPriceResponse } from '../api-interfaces';
 
@@ -27,8 +27,30 @@ export class AppController {
 
   @Get('tcgplayerprice')
   async tcgplayerprice(@Query('name') name: string, @Query('rarity') rarity: string, @Query('code') code: string): Promise<number> {
-    const price = await this.appService.checkTCGPlayer({ count: 1, rarity, name, code });
+    const price = await this.appService.checkTCGPlayer({ rarity, name, code });
     return price;
+  }
+
+  @Get('tcgplayerpricemulti')
+  async tcgplayerprices(
+    @Query('name', new ParseArrayPipe({ items: String, separator: '|' })) name: string[],
+    @Query('rarity', new ParseArrayPipe({ items: String, separator: '|' })) rarity: string[],
+    @Query('code', new ParseArrayPipe({ items: String, separator: '|' })) code: string[]
+  ): Promise<number[]> {
+
+    const objects = [];
+    for(let i = 0; i < name.length; i++) {
+      objects.push({
+        name: name[i],
+        rarity: rarity[i],
+        code: code[i]
+      });
+    }
+
+    if(objects.length > 50) objects.length = 50;
+
+    const prices = await Promise.all(objects.map(obj => this.appService.checkTCGPlayer(obj)));
+    return prices;
   }
 
 }

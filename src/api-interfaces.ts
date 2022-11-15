@@ -1,7 +1,6 @@
 export interface CardCheck {
   name: string;
   rarity: string;
-  count: number;
   code: string;
 }
 
