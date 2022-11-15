@@ -2,6 +2,7 @@ export interface CardCheck {
   name: string;
   rarity: string;
   count: number;
+  code: string;
 }
 
 export type CardCheckWithPrice = CardCheck & {
@@ -50,6 +51,7 @@ export enum Rarity {
   KR = 'Kaguya Rare',
   STR = 'Starlight Rare',
   JJR = 'JoJo Rare',
-
+  HLP = 'Hololive Parallel',
+  N = 'Normal'
 
 }

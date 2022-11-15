@@ -77,7 +77,7 @@ export class AppService {
 
     Logger.log(`Searching ${card.name} (${card.rarity})`, 'tcgplayer');
 
-    const storedPrice = await this.db.getTCGPlayerPrice(card.name, card.rarity);
+    const storedPrice = await this.db.getTCGPlayerPrice(card.code);
     if(storedPrice) return storedPrice.price;
 
     const publicKey = process.env.TCGPLAYER_PUBLIC_KEY;
@@ -146,7 +146,7 @@ export class AppService {
     const priceRes = pricesBody.results[0];
     const price = priceRes.marketPrice || priceRes.midPrice;
 
-    await this.db.updateTCGPlayerPrice(card.name, card.rarity, price);
+    await this.db.updateTCGPlayerPrice(card.name, card.rarity, card.code, price);
 
     return price;
   }

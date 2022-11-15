@@ -19,7 +19,7 @@ export async function dbInit() {
 };
 
 export function setupCollection(collection: Collection): Collection {
-  collection.createIndex( { createdAt: 1 }, { expireAfterSeconds: 432000 });
+  collection.createIndex( { createdAt: 1 }, { expireAfterSeconds: 86400 });
   return collection;
 }
 
@@ -45,14 +45,14 @@ export class DBService {
   }
   */
 
-  public async getTCGPlayerPrice(name: string, rarity: string): Promise<Price> {
-    return this.tcgplayerCollection.findOne<Price>({ name, rarity });
+  public async getTCGPlayerPrice(code: string): Promise<Price> {
+    return this.tcgplayerCollection.findOne<Price>({ code });
   }
 
-  public async updateTCGPlayerPrice(name: string, rarity: string, price: number): Promise<void> {
+  public async updateTCGPlayerPrice(name: string, rarity: string, code: string, price: number): Promise<void> {
     return this.tcgplayerCollection.updateOne(
       { name },
-      { $set: { name, rarity, price, createdAt: new Date() } },
+      { $set: { name, rarity, price, code, createdAt: new Date() } },
       { upsert: true }
     );
   }
